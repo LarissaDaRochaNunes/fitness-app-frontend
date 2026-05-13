@@ -1,24 +1,11 @@
-import { useState } from "react";
-import { Button } from "./components/ui/button";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Login } from './Pages/Login'
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          index
-          element={
-            <Button
-              type="button"
-              onClick={() => setCount((count) => count + 1)}
-            >
-              Count is {count}
-            </Button>
-          }
-        />
+        <Route path="/" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );
