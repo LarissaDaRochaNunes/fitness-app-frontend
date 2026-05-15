@@ -9,6 +9,7 @@ function App() {
       <Routes>
         <Route path="/" element={<SingIn />} />
         <Route path="/singUp" element={<SingUp/>}/>
+        <Route path="/singIn" element={<SingIn/>}/>
       </Routes>
     </BrowserRouter>
   );

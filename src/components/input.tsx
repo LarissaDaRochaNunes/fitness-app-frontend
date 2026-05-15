@@ -6,16 +6,17 @@ interface InputProps extends ComponentProps<'input'> {
   id: string;
 }
 
-export function Input({ label, id, type, ...props }: InputProps) {
+export function Input({ label, id, type,required, ...props }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password';
-
   const inputType = isPassword && showPassword ? 'text' : type;
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <label htmlFor={id} className="text-sm font-medium text-[#374151]">
+      <label htmlFor={id} className="text-sm font-medium text-[black]">
         {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+        
       </label>
       
       <div className="relative">
