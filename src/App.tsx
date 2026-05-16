@@ -1,15 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { SingIn } from './pages/SingIn';
-import {SingUp} from './pages/SingUp';
+import { SignIn } from './pages/SignIn';
+import {SignUp} from './pages/SignUp';
 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<SingIn />} />
-        <Route path="/singUp" element={<SingUp/>}/>
-        <Route path="/singIn" element={<SingIn/>}/>
+        <Route path="/" element={<SignIn />} />
+        <Route path="/signUp" element={<SignUp/>}/>
+        <Route path="/signIn" element={<SignIn/>}/>
       </Routes>
     </BrowserRouter>
   );

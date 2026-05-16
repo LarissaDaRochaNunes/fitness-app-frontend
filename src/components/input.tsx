@@ -4,19 +4,19 @@ import { Eye, EyeOff } from 'lucide-react';
 interface InputProps extends ComponentProps<'input'> {
   label: string;
   id: string;
+  error?: string;
 }
 
-export function Input({ label, id, type,required, ...props }: InputProps) {
+export function Input({ label, id, type, required, error, ...props }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password';
   const inputType = isPassword && showPassword ? 'text' : type;
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <label htmlFor={id} className="text-sm font-medium text-[black]">
+      <label htmlFor={id} className={`text-sm font-medium ${error ? 'text-red-600' : 'text-[black]'}`}>
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-        
+        {required && <span className="text-red-600 ml-1">*</span>}
       </label>
       
       <div className="relative">
@@ -24,20 +24,25 @@ export function Input({ label, id, type,required, ...props }: InputProps) {
           {...props} 
           id={id}
           type={inputType}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[black] focus:border-transparent transition-all placeholder:text-gray-400"
+          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all
+            ${error 
+              ? 'border-red-600 text-red-600 placeholder:text-red-600 focus:ring-red-600' 
+              : 'border-gray-300 focus:ring-[black] placeholder:text-gray-400'
+            }`}
         />
 
-        {/* Botão de mostrar/esconder senha (só aparece se o tipo for password) */}
         {isPassword && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors ${error ? 'text-red-600' : 'text-gray-400 hover:text-gray-600'}`}
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         )}
       </div>
+
+      {error && <span className="text-red-600 text-sm font-bold mt-1">{error}</span>}
     </div>
   );
 }
