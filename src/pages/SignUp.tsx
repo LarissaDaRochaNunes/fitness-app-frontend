@@ -51,8 +51,7 @@ export function SignUp() {
         password,
       });
 
-      alert('Cadastro realizado com sucesso!');
-      navigate('/Home');
+      navigate('/SignIn');
     } catch (error: any) {
       const mensagemErro = error.response?.data?.message || 'Erro ao cadastrar. Tente novamente.';
       alert(mensagemErro);
@@ -67,7 +66,7 @@ export function SignUp() {
   };
 
   return (
-    <main className='flex h-screen overflow-hidden'>
+    <div className='flex h-screen overflow-hidden'>
       <div className='hidden md:block w-1/2 h-full'>
         <img src={imagemFundo} alt="Pessoas se exercitando ao ar livre" className='w-full h-full object-cover object-center rounded-2xl p-3' />
       </div>
@@ -134,13 +133,13 @@ export function SignUp() {
           </form>
 
           <p className='text-sm text-muted-foreground text-center'>
-            Já tem uma conta?{' '}
+            Já tem uma conta?
             <Link to="/SignIn" className='font-semibold hover:underline text-black'>
               Faça login
             </Link>
           </p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

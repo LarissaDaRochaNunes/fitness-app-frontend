@@ -29,8 +29,6 @@ export function SignIn(){
                 api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             }
 
-            alert ('Login realizado com sucesso!');
-
             navigate('/Home'); 
         } catch (error:any){
            const mensagemErro = error.response?.data?.message || 'E-mail ou senha incorretos.';
@@ -40,7 +38,7 @@ export function SignIn(){
     }
  
     return (
-        <main className='flex min-h-screen'>
+        <div className='flex min-h-screen'>
             <div className='hidden md:block w-full md:w-1/2'>
                 <img src={imagemFundo} alt="Pessoas se exercitando ao ar livre" className='w-full h-full object-cover object-center rounded-2xl p-3' />
             </div>
@@ -67,7 +65,7 @@ export function SignIn(){
                         </p>
                     </div>
                 </div>
-        </main>
+        </div>
     )
 }
 
