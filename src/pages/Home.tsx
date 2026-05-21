@@ -1,12 +1,27 @@
 import { useState, useEffect } from 'react';
 import logo from '../assets/Logo.png';
-import pessoa from '../assets/pessoa.png';
+import pessoa from '..//assets/pessoa.png';
 import { Button } from '../components/Button';
 import { PlusCircle } from 'lucide-react';
 import avatar from '../assets/avatar.jpg';
 import { CardAtividade } from '../components/CardAtividades';
 import { ATIVIDADES_PADRAO } from '../config/AtividadesPadrao';
 import type { Atividade } from '../types/atividades';
+import { PreferencesModal } from '../components/PreferencesModal'; 
+import { CreateActivityModal } from '..//components/createActivityModal'; 
+
+export interface TipoAtividade {
+    id: string;
+    nome: string;
+    imagemUrl: string;
+}
+
+const TIPOS_ATIVIDADES: TipoAtividade[] = [
+    { id: 'futebol', nome: 'Futebol', imagemUrl: 'https://apibootcamp2026.sysmap.com.br/images/1777033893392futebol.jpg' },
+    { id: 'basquete', nome: 'Basquete', imagemUrl: 'https://apibootcamp2026.sysmap.com.br/images/1777033894191basquete.jpg' },
+    { id: 'caminhada', nome: 'Caminhada', imagemUrl: 'https://apibootcamp2026.sysmap.com.br/images/1777033894224caminhada.jpg' },
+    { id: 'volei', nome: 'Vôlei', imagemUrl: 'https://apibootcamp2026.sysmap.com.br/images/1777033894312v%C3%B4lei.jpg' },
+];
 
 const buscarAtividadesDoUsuario = async (): Promise<Atividade[] | null> => {
     return null; 
@@ -14,6 +29,8 @@ const buscarAtividadesDoUsuario = async (): Promise<Atividade[] | null> => {
 
 export function Home() {
     const [atividadesRecomendadas, setAtividadesRecomendadas] = useState<Atividade[]>(ATIVIDADES_PADRAO);
+    const [isModalOpen, setIsModalOpen] = useState(true);
+    const [isCreateActivityOpen, setIsCreateActivityOpen] = useState(false);
 
     useEffect(() => {
         async function carregarRecomendacoes() {
@@ -29,6 +46,10 @@ export function Home() {
         carregarRecomendacoes();
     }, []);
 
+    const handlePreferencesConfirm = (selectedIds: string[]) => {
+        console.log("IDs das atividades que o usuário escolheu no onboarding:", selectedIds);
+    };
+
     const ATIVIDADE_GENERICA: Atividade = {
         id: 'generic-id',
         titulo: 'Exercícios',
@@ -37,7 +58,6 @@ export function Home() {
         participantes: 4,
         exclusivo: false,
     };
-
 
     const criarListaGenerica = (baseIdPrefix: string): Atividade[] => {
         return Array(6).fill(0).map((_, i) => ({
@@ -48,19 +68,23 @@ export function Home() {
     };
 
     return (
-        <div className='container mx-auto px-4 lg:px-20 py-6 max-w-7xl'>
+        <div className='container mx-auto px-4 lg:px-20 py-6 max-w-7xl relative'>
             
             <header className='w-full flex justify-between items-center h-20 border-b border-gray-100 mb-10'>
                 <img src={logo} alt="Logotipo FitMeet" className='p-2 rounded-2xl' />
                 <div className='flex items-center gap-4'>
-                    <Button className='flex items-center gap-2'> <PlusCircle size={20} /> Criar atividade</Button>
+                    <Button 
+                        className='flex items-center gap-2'
+                        onClick={() => setIsCreateActivityOpen(true)}
+                    > 
+                        <PlusCircle size={20} /> Criar atividade
+                    </Button>
                     <a href="/perfil">
-                        <img src={avatar} alt="Avatar do usuário" className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500" />
+                        <img src={avatar} alt="Avatar do usuário" className="`h-14 w-14 rounded-full object-cover border-2 transition-all border-emerald-500 shadow-md" />
                     </a>
                 </div>
             </header>
 
-            {/* RECOMENDADOS PARA VOCÊ */}
             <div className='mb-14'>
                 <h1 className='text-3xl font-display mb-4'>Recomendados para você</h1>
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
@@ -70,22 +94,19 @@ export function Home() {
                 </div>
             </div>
 
-            {/* TIPOS DE ATIVIDADES */}
             <div className='mb-14'>
                 <h1 className='text-3xl font-display mb-4'>Tipos de atividades</h1>
                 <div className='flex gap-8 overflow-x-auto pb-3 scrollbar-none'>
-                    {['Futebol', 'Basquete', 'Caminhada', 'Vôlei'].map((esporte, index) => (
-                        <a key={esporte} className='shrink-0 grid justify-items-center gap-3 hover:scale-105 transition-transform' href="#">
-                            <img className='w-20 h-20 rounded-full aspect-square object-cover shadow-sm border border-gray-150' src={`https://apibootcamp2026.sysmap.com.br/images/${index === 0 ? '1777033893392futebol.jpg' : index === 1 ? '1777033894191basquete.jpg' : index === 2 ? '1777033894224caminhada.jpg' : '1777033894312v%C3%B4lei.jpg'}`} alt={esporte} />
-                            <span className='font-bold text-gray-800 text-sm'>{esporte}</span>
+                    {TIPOS_ATIVIDADES.map((esporte) => (
+                        <a key={esporte.id} className='shrink-0 grid justify-items-center gap-3 hover:scale-105 transition-transform' href="#">
+                            <img className='w-20 h-20 rounded-full aspect-square object-cover shadow-sm border border-gray-150' src={esporte.imagemUrl} alt={esporte.nome} />
+                            <span className='font-bold text-gray-800 text-sm'>{esporte.nome}</span>
                         </a>
                     ))}
                 </div>
             </div>
 
-            {/* GRIDS INFERIORES: BLOCO 1 (Corrida e Ciclismo) */}
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-12 mb-12'>
-                
                 <div>
                     <div className='mb-4 flex justify-between items-end border-b border-gray-200 pb-2'>
                         <h2 className='text-3xl font-display mb-4'>Corrida</h2>
@@ -109,12 +130,9 @@ export function Home() {
                         ))}
                     </div>
                 </div>
-
             </div>
 
-            {/* GRIDS INFERIORES: BLOCO 2 (Ioga e Musculação) */}
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-12'>
-                
                 <div>
                     <div className='mb-4 flex justify-between items-end border-b border-gray-200 pb-2'>
                         <h2 className='text-3xl font-display mb-4'>Ioga</h2>
@@ -138,8 +156,19 @@ export function Home() {
                         ))}
                     </div>
                 </div>
-
             </div>
+
+            <PreferencesModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                onConfirm={handlePreferencesConfirm}
+            />
+
+            <CreateActivityModal 
+                isOpen={isCreateActivityOpen}
+                onClose={() => setIsCreateActivityOpen(false)}
+                tiposAtividades={TIPOS_ATIVIDADES}
+            />
 
         </div>
     );

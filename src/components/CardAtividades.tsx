@@ -4,7 +4,7 @@ import { Calendar, Users, Lock } from 'lucide-react';
 
 interface CardAtividadeProps {
   atividade: Atividade;
-  layout?: 'vertical' | 'horizontal'; // Nova propriedade opcional
+  layout?: 'vertical' | 'horizontal';
 }
 
 export const CardAtividade: React.FC<CardAtividadeProps> = ({ atividade, layout = 'vertical' }) => {
