@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import logo from '../assets/Logo.png';
-import pessoa from '..//assets/pessoa.png';
-import { Button } from '../components/Button';
-import { PlusCircle } from 'lucide-react';
+import pessoa from '../assets/pessoa.png';
 import avatar from '../assets/avatar.jpg';
 import { CardAtividade } from '../components/CardAtividades';
 import { ATIVIDADES_PADRAO } from '../config/AtividadesPadrao';
 import type { Atividade } from '../types/atividades';
 import { PreferencesModal } from '../components/PreferencesModal'; 
-import { CreateActivityModal } from '..//components/createActivityModal'; 
+import { CreateActivityModal } from '../components/createActivityModal'; 
+import { ProfileModal } from '../components/ProfileModal'; 
+import { buscarDadosUsuario, atualizarFotoPerfil } from '../services/userService';
 
 export interface TipoAtividade {
     id: string;
@@ -29,25 +29,58 @@ const buscarAtividadesDoUsuario = async (): Promise<Atividade[] | null> => {
 
 export function Home() {
     const [atividadesRecomendadas, setAtividadesRecomendadas] = useState<Atividade[]>(ATIVIDADES_PADRAO);
-    const [isModalOpen, setIsModalOpen] = useState(true);
-    const [isCreateActivityOpen, setIsCreateActivityOpen] = useState(false);
+    const [userName, setUserName] = useState("Carregando...");
+    const [userAvatar, setUserAvatar] = useState(avatar);
+    const [userEmail, setUserEmail] = useState("");
+    const [userCpf, setUserCpf] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const [isCreateActivityOpen, setIsCreateActivityOpen] = useState(false); 
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false); 
 
     useEffect(() => {
-        async function carregarRecomendacoes() {
+        async function carregarDadosIniciais() {
             try {
+            
                 const dadosDoBack = await buscarAtividadesDoUsuario();
                 if (dadosDoBack && dadosDoBack.length > 0) {
                     setAtividadesRecomendadas(dadosDoBack);
                 }
+
+                const dadosUsuario = await buscarDadosUsuario();
+                
+                if (dadosUsuario) {
+                    if (dadosUsuario.name) setUserName(dadosUsuario.name); 
+                    if (dadosUsuario.avatar) setUserAvatar(dadosUsuario.avatar); 
+                    if (dadosUsuario.email) setUserEmail(dadosUsuario.email); 
+                    if (dadosUsuario.cpf) setUserCpf(dadosUsuario.cpf);     
+                }
+
+                setIsModalOpen(true);
+
             } catch (error) {
-                console.error("Erro ao carregar preferências, usando padrão.", error);
+                console.error("Erro ao carregar os dados:", error);
+                setUserName("Usuário"); 
             }
         }
-        carregarRecomendacoes();
+        carregarDadosIniciais();
     }, []);
+    const handleAvatarUpload = async (arquivo: File) => {
+        try {
+            const previewUrl = URL.createObjectURL(arquivo);
+            setUserAvatar(previewUrl);
+
+            const resposta = await atualizarFotoPerfil(arquivo);
+            if (resposta && resposta.avatar) {
+                 setUserAvatar(resposta.avatar);
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar a foto de perfil:", error);
+            alert("Não foi possível atualizar a foto. Tente novamente.");
+        }
+    };
 
     const handlePreferencesConfirm = (selectedIds: string[]) => {
-        console.log("IDs das atividades que o usuário escolheu no onboarding:", selectedIds);
+        console.log("IDs das atividades escolhidas:", selectedIds)
     };
 
     const ATIVIDADE_GENERICA: Atividade = {
@@ -73,15 +106,21 @@ export function Home() {
             <header className='w-full flex justify-between items-center h-20 border-b border-gray-100 mb-10'>
                 <img src={logo} alt="Logotipo FitMeet" className='p-2 rounded-2xl' />
                 <div className='flex items-center gap-4'>
-                    <Button 
-                        className='flex items-center gap-2'
-                        onClick={() => setIsCreateActivityOpen(true)}
-                    > 
-                        <PlusCircle size={20} /> Criar atividade
-                    </Button>
-                    <a href="/perfil">
-                        <img src={avatar} alt="Avatar do usuário" className="`h-14 w-14 rounded-full object-cover border-2 transition-all border-emerald-500 shadow-md" />
-                    </a>
+
+                    <button className="bg-emerald-500 text-white font-bold px-4 py-2  flex items-center gap-2 text-sm hover:bg-emerald-600 transition-colors"
+                     onClick={() => setIsCreateActivityOpen(true)}>+ Criar atividade
+                    </button>
+                    
+                    <button 
+                        onClick={() => setIsProfileModalOpen(true)} 
+                        className="focus:outline-none rounded-full hover:ring-2 hover:ring-emerald-500 hover:ring-offset-2 transition-all"
+                    >
+                        <img 
+                            src={userAvatar} 
+                            alt={`Avatar de ${userName}`} 
+                            className="h-14 w-14 rounded-full object-cover border-2 transition-all border-emerald-500 shadow-md" 
+                        />
+                    </button>
                 </div>
             </header>
 
@@ -158,16 +197,29 @@ export function Home() {
                 </div>
             </div>
 
-            <PreferencesModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-                onConfirm={handlePreferencesConfirm}
-            />
-
             <CreateActivityModal 
                 isOpen={isCreateActivityOpen}
                 onClose={() => setIsCreateActivityOpen(false)}
                 tiposAtividades={TIPOS_ATIVIDADES}
+            />
+
+            <ProfileModal 
+                isOpen={isProfileModalOpen} 
+                onClose={() => setIsProfileModalOpen(false)} 
+                userName={userName}
+                userAvatar={userAvatar}
+                userEmail={userEmail}
+                userCpf={userCpf}
+                onAvatarUpload={handleAvatarUpload}
+                tiposAtividades={TIPOS_ATIVIDADES} // PASSANDO A LISTA DE ESPORTES AQUI
+                minhasAtividades={criarListaGenerica('minhas').slice(0, 4)} 
+                historicoAtividades={criarListaGenerica('historico')}
+            />
+
+            <PreferencesModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                onConfirm={handlePreferencesConfirm}
             />
 
         </div>
